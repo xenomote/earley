@@ -4,19 +4,17 @@ import (
 	"fmt"
 
 	"github.com/xenomote/go_parser/pkg/parser"
+	"github.com/xenomote/go_parser/pkg/token"
 )
 
 func main() {
 	var (
-		one = parser.Token{"1", "1"}
-		add = parser.Token{"+", "+"}
-		// mul = parser.Token{"*", "*"}
+		one = token.Literal("1")
+		add = token.Literal("+")
+		// mul = token.Literal("*")
 	)
 
-	tokens := []parser.Token{one, add, one}
-	stream := make(chan parser.Token)
-
-	go writeAll(tokens, stream)
+	stream := token.Stream(one, add, one)
 
 	var (
 		e = parser.Symbol{"E", false}
@@ -38,13 +36,6 @@ func main() {
 
 	p.Parse(stream)
 
-	fmt.Printf("%s\n", p.Locations)
+	fmt.Printf("%s\n", p.States)
 	fmt.Println(p.IsMatched())
-}
-
-func writeAll(tokens []parser.Token, stream chan<- parser.Token) {
-	for _, token := range tokens {
-		stream <- token
-	}
-	close(stream)
 }
