@@ -1,5 +1,7 @@
 package token
 
+var EOF = Token{}
+
 type Token struct {
 	Symbol string
 	Source string

@@ -4,12 +4,12 @@ import "github.com/xenomote/go_parser/pkg/token"
 
 type parser struct {
 	Grammar  grammar
-	States   []set
+	States   []stateSet
 	Position int
 }
 
 func New(g grammar) parser {
-	start := set{}
+	start := stateSet{}
 
 	for i := range g.Productions {
 		production := g.Productions[i]
@@ -20,23 +20,24 @@ func New(g grammar) parser {
 
 	return parser{
 		Grammar:  g,
-		States:   []set{start},
+		States:   []stateSet{start},
 		Position: 0,
 	}
 }
 
 func (p *parser) Parse(ts <-chan token.Token) {
 	for token := range ts {
-		p.States = append(p.States, set{})
+		p.States = append(p.States, stateSet{})
 		p.process(token)
 		p.Position++
 	}
-	p.process(token.Token{})
+	p.process(token.EOF)
 }
 
 func (p *parser) process(t token.Token) {
-	for i := 0; i < len(p.Current().States); i++ {
-		state := p.Current().States[i]
+	// states set may expand during this loop
+	for i := 0; i < len(p.current().States); i++ {
+		state := p.current().States[i]
 
 		if state.IsFinished() {
 			p.match(state)
@@ -53,7 +54,7 @@ func (p *parser) predict(s state) {
 		production := &p.Grammar.Productions[i]
 		if production.Name == s.Predicted().Name {
 			prediction := state{production, 0, p.Position}
-			p.Current().Add(prediction)
+			p.current().Add(prediction)
 		}
 	}
 }
@@ -73,21 +74,25 @@ func (p *parser) match(s state) {
 		if origin.Predicted().Name == s.Production.Name {
 			matched := origin
 			matched.Index++
-			p.Current().Add(matched)
+			p.current().Add(matched)
 		}
 	}
 }
 
-func (p parser) Current() *set {
+func (p parser) current() *stateSet {
 	return &p.States[p.Position]
 }
 
 func (p parser) IsMatched() bool {
-	for _, state := range p.Current().States {
+	for _, state := range p.current().States {
 		production := state.Production
 		if production.Name == p.Grammar.Initial && state.Index == len(production.Symbols) {
 			return true
 		}
 	}
 	return false
+}
+
+func (p parser) Trees() []Tree {
+	return nil
 }
