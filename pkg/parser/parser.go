@@ -93,6 +93,6 @@ func (p parser) IsMatched() bool {
 	return false
 }
 
-func (p parser) Trees() []Tree {
+func (p parser) Tree() *Tree {
 	return nil
 }

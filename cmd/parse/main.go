@@ -43,14 +43,14 @@ func main() {
 		Name: "A",
 		Nodes: []parser.Tree{
 			{
-				Name: "B",
+				Name:  "B",
 				Nodes: []parser.Tree{},
 			},
 			{
 				Name: "C",
 				Nodes: []parser.Tree{
 					{
-						Name: "D",
+						Name:  "D",
 						Nodes: []parser.Tree{},
 					},
 				},

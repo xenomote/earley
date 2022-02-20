@@ -23,7 +23,7 @@ func Literal(symbol string) Token {
 
 type stream <-chan Token
 
-func Stream(tokens... Token) stream {
+func Stream(tokens ...Token) stream {
 	stream := make(chan Token)
 	go writeAll(tokens, stream)
 	return stream

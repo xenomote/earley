@@ -7,7 +7,7 @@ import (
 const INDENT = "  "
 
 type Tree struct {
-	Name string
+	Name  string
 	Token *token.Token
 	Nodes []Tree
 }
@@ -15,14 +15,14 @@ type Tree struct {
 func (t Tree) String() string {
 	return t.stringAux(0)
 }
- 
+
 func (t Tree) stringAux(i int) string {
 	o := indent(i) + t.Name
 	if len(t.Nodes) > 0 {
 		o += ":"
 	}
 	for _, n := range t.Nodes {
-		o += "\n" + n.stringAux(i + 1)
+		o += "\n" + n.stringAux(i+1)
 	}
 	return o
 }
