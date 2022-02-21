@@ -1,62 +1,43 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/xenomote/go_parser/pkg/parser"
-	"github.com/xenomote/go_parser/pkg/token"
+	"github.com/xenomote/go_parser/pkg/scanner"
+	"github.com/xenomote/go_parser/pkg/symbol"
 )
 
 func main() {
 	var (
-		one = token.Literal("1")
-		add = token.Literal("+")
-		mul = token.Literal("*")
+		e = symbol.NonTerminal("E")
+		v = symbol.NonTerminal("V")
+
+		o = symbol.Terminal("1")
+		a = symbol.Terminal("+")
+		m = symbol.Terminal("*")
 	)
 
-	stream := token.Stream(one, add, one, mul, one)
-
-	var (
-		e = parser.Symbol{"E", false}
-		v = parser.Symbol{"V", false}
-
-		o = parser.Symbol{"1", true}
-		a = parser.Symbol{"+", true}
-		m = parser.Symbol{"*", true}
+	s := scanner.New(
+		scanner.Pattern(o, regexp.MustCompile("0|[1-9][0-9]*")),
 	)
+	ts := s.Scan(strings.NewReader("1 + 1 * 3"))
 
 	g := parser.Grammar(
-		parser.Production("S", e),
-		parser.Production("E", e, m, e),
-		parser.Production("E", e, a, e),
-		parser.Production("E", v),
-		parser.Production("V", o),
+		parser.Rule("S", e),
+		parser.Rule("E", e, m, e),
+		parser.Rule("E", e, a, e),
+		parser.Rule("E", v),
+		parser.Rule("V", o),
 	)
 	p := parser.New(g)
 
-	p.Parse(stream)
+
+	p.Parse(ts)
 
 	fmt.Printf("%s\n", p.States)
 	fmt.Println(p.IsMatched())
-
-	t := parser.Tree{
-		Name: "A",
-		Nodes: []parser.Tree{
-			{
-				Name:  "B",
-				Nodes: []parser.Tree{},
-			},
-			{
-				Name: "C",
-				Nodes: []parser.Tree{
-					{
-						Name:  "D",
-						Nodes: []parser.Tree{},
-					},
-				},
-			},
-		},
-	}
-
-	fmt.Println(t)
 }

@@ -1,8 +1,6 @@
 package parser
 
-import (
-	"github.com/xenomote/go_parser/pkg/token"
-)
+import "github.com/xenomote/go_parser/pkg/token"
 
 const INDENT = "  "
 

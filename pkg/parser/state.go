@@ -1,25 +1,27 @@
 package parser
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type state struct {
-	Production *production
-	Index      int
-	Origin     int
+	Rule   *rule
+	Index  int
+	Origin int
 }
 
 func (s state) IsFinished() bool {
-	return s.Index == len(s.Production.Symbols)
+	return s.Index == len(s.Rule.Production)
 }
 
 func (s state) Predicted() Symbol {
-	return s.Production.Symbols[s.Index]
+	return s.Rule.Production[s.Index]
 }
 
 func (s state) String() string {
-	name := s.Production.Name
-	left := s.Production.Symbols[:s.Index]
-	right := s.Production.Symbols[s.Index:]
+	name := s.Rule.Name
+	left := s.Rule.Production[:s.Index]
+	right := s.Rule.Production[s.Index:]
 	source := s.Origin
 
 	return fmt.Sprintf("(%s->%s.%s, %d)", name, left, right, source)

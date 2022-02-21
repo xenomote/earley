@@ -11,10 +11,10 @@ type parser struct {
 func New(g grammar) parser {
 	start := stateSet{}
 
-	for i := range g.Productions {
-		production := g.Productions[i]
-		if production.Name == g.Initial {
-			start.Add(state{&production, 0, 0})
+	for i := range g.Rules {
+		rule := g.Rules[i]
+		if rule.Name == g.Initial {
+			start.Add(state{&rule, 0, 0})
 		}
 	}
 
@@ -26,9 +26,9 @@ func New(g grammar) parser {
 }
 
 func (p *parser) Parse(ts <-chan token.Token) {
-	for token := range ts {
+	for t := range ts {
 		p.States = append(p.States, stateSet{})
-		p.process(token)
+		p.process(t)
 		p.Position++
 	}
 	p.process(token.EOF)
@@ -41,7 +41,7 @@ func (p *parser) process(t token.Token) {
 
 		if state.IsFinished() {
 			p.match(state)
-		} else if state.Predicted().IsTerminal {
+		} else if t != token.EOF && state.Predicted().IsTerminal() {
 			p.scan(state, t)
 		} else {
 			p.predict(state)
@@ -50,9 +50,9 @@ func (p *parser) process(t token.Token) {
 }
 
 func (p *parser) predict(s state) {
-	for i := range p.Grammar.Productions {
-		production := &p.Grammar.Productions[i]
-		if production.Name == s.Predicted().Name {
+	for i := range p.Grammar.Rules {
+		production := &p.Grammar.Rules[i]
+		if production.Name == s.Predicted().Name() {
 			prediction := state{production, 0, p.Position}
 			p.current().Add(prediction)
 		}
@@ -60,7 +60,7 @@ func (p *parser) predict(s state) {
 }
 
 func (p *parser) scan(s state, t token.Token) {
-	if s.Predicted().Name == t.Symbol {
+	if s.Predicted().Name() == t.Symbol() {
 		scanned := s
 		scanned.Index++
 		p.States[p.Position+1].Add(scanned)
@@ -71,7 +71,7 @@ func (p *parser) match(s state) {
 	origins := p.States[s.Origin]
 
 	for _, origin := range origins.States {
-		if origin.Predicted().Name == s.Production.Name {
+		if origin.Predicted().Name() == s.Rule.Name {
 			matched := origin
 			matched.Index++
 			p.current().Add(matched)
@@ -85,8 +85,8 @@ func (p parser) current() *stateSet {
 
 func (p parser) IsMatched() bool {
 	for _, state := range p.current().States {
-		production := state.Production
-		if production.Name == p.Grammar.Initial && state.Index == len(production.Symbols) {
+		production := state.Rule
+		if production.Name == p.Grammar.Initial && state.Index == len(production.Production) {
 			return true
 		}
 	}

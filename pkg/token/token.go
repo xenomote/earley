@@ -3,35 +3,37 @@ package token
 var EOF = Token{}
 
 type Token struct {
-	Symbol string
-	Source string
+	symbol string
+	source string
+}
+
+func (t Token) Symbol() string {
+	return t.symbol
 }
 
 func New(symbol, source string) Token {
 	return Token{
-		Symbol: symbol,
-		Source: source,
+		symbol: symbol,
+		source: source,
 	}
 }
 
-func Literal(symbol string) Token {
+func Literal(s string) Token {
 	return Token{
-		Symbol: symbol,
-		Source: symbol,
+		symbol: s,
+		source: s,
 	}
 }
 
-type stream <-chan Token
-
-func Stream(tokens ...Token) stream {
+func Stream(ts... Token) <-chan Token {
 	stream := make(chan Token)
-	go writeAll(tokens, stream)
+	go writeAll(ts, stream)
 	return stream
 }
 
-func writeAll(tokens []Token, stream chan<- Token) {
-	for _, token := range tokens {
-		stream <- token
+func writeAll(ts []Token, s chan<- Token) {
+	for _, t := range ts {
+		s <- t
 	}
-	close(stream)
+	close(s)
 }

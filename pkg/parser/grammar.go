@@ -1,22 +1,37 @@
 package parser
 
 type grammar struct {
-	Initial     string
-	Productions []production
+	Initial string
+	Rules   []rule
 }
 
-func Grammar(initial production, productions ...production) grammar {
+func Grammar(p rule, ps ...rule) grammar {
 	return grammar{
-		Initial:     initial.Name,
-		Productions: append([]production{initial}, productions...),
+		Initial: p.Name,
+		Rules:   append([]rule{p}, ps...),
 	}
 }
 
-type production struct {
-	Name    string
-	Symbols symbols
+type rule struct {
+	Name       string
+	Production production
 }
 
-func Production(name string, symbols ...Symbol) production {
-	return production{Name: name, Symbols: symbols}
+func Rule(name string, symbols ...Symbol) rule {
+	return rule{Name: name, Production: symbols}
+}
+
+type production []Symbol
+
+type Symbol interface {
+	Name() string
+	IsTerminal() bool
+}
+
+func (p production) String() string {
+	o := ""
+	for _, s := range p {
+		o += s.Name()
+	}
+	return o
 }
