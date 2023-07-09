@@ -1,2 +1,2 @@
-# go_parser
-go implementation of an Earley parser
+# Earley Parser
+An implementation of an Earley parser written in Go
