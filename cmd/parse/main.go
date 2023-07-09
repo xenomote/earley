@@ -1,14 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"regexp"
 	"strings"
 
-	"github.com/xenomote/go_parser/pkg/parser"
-	"github.com/xenomote/go_parser/pkg/scanner"
-	"github.com/xenomote/go_parser/pkg/symbol"
+	"github.com/xenomote/earley/internal/parser"
+	"github.com/xenomote/earley/internal/scanner"
+	"github.com/xenomote/earley/internal/symbol"
 )
 
 func main() {
@@ -35,9 +34,8 @@ func main() {
 	)
 	p := parser.New(g)
 
-
 	p.Parse(ts)
 
-	fmt.Printf("%s\n", p.States)
+	fmt.Println(p.States)
 	fmt.Println(p.IsMatched())
 }

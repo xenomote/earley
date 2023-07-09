@@ -1,3 +1,3 @@
-module github.com/xenomote/go_parser
+module github.com/xenomote/earley
 
 go 1.17
