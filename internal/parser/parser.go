@@ -94,5 +94,5 @@ func (p parser) IsMatched() bool {
 }
 
 func (p parser) Tree() *Tree {
-	return nil
+	panic("not implemented")
 }
